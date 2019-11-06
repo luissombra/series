@@ -1,0 +1,1 @@
+export default series = (state = [], action) => state

@@ -7,10 +7,10 @@ import {
   Icon,
   Button
 } from 'react-native-ui-kitten';
-import * as firebase from "firebase/app";
-import "firebase/auth";
 import FormSection from '../components/FormSection';
-import firebaseAuth from '../utils/firebase';
+import { connect } from 'react-redux';
+import { tryLogin } from '../actions/user';
+
 
 class LoginScreen extends React.Component {
   constructor(props){
@@ -20,6 +20,8 @@ class LoginScreen extends React.Component {
       email: '',
       pass: ''
     }
+
+    this._handleLoginButtonPress = this._handleLoginButtonPress.bind(this)
   }
 
   componentDidMount(){
@@ -30,6 +32,12 @@ class LoginScreen extends React.Component {
     this.setState({
       [field]: value
     });
+  }
+
+  _handleLoginButtonPress(){
+    const {email, pass} = this.state
+    const { tryLogin } = this.props
+    tryLogin(email, pass)
   }
 
   handleViewPassIconClick = () => {
@@ -72,7 +80,7 @@ class LoginScreen extends React.Component {
             </Layout>
           </FormSection>
           <FormSection>
-            <Button style={styles.button} size='giant'>Fazer login</Button>
+            <Button style={styles.button} size='giant' onPress={this._handleLoginButtonPress}>Fazer login</Button>
             <Button style={styles.button} size='giant' appearance='ghost'>Ainda não tem conta?</Button>
           </FormSection>
       </Layout>
@@ -99,4 +107,8 @@ const styles = StyleSheet.create({
   }
 });
 
-export default LoginScreen
+const mapStateToProps = (state) => ({
+  statusMessage: state.statusMessage
+})
+
+export default connect(null, { tryLogin })(LoginScreen)
