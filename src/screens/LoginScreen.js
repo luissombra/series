@@ -13,6 +13,7 @@ import { connect } from 'react-redux'
 import { tryLogin } from '../actions/user'
 import defaultStyle from '../styles/default'
 import StatusMessageDisplay from '../components/StatusMessageDisplay'
+import getMessageByErrorCode from '../utils/getMessageByErrorCode'
 
 class LoginScreen extends React.Component {
   constructor(props){
@@ -21,8 +22,7 @@ class LoginScreen extends React.Component {
     this._handleLoginButtonPress = this._handleLoginButtonPress.bind(this)    
     this.state = {
       loading: false,
-      message: '',
-      err: false,
+      statusMessage: null,
       showPass: false,
       email: '',
       pass: ''
@@ -44,7 +44,28 @@ class LoginScreen extends React.Component {
   _handleLoginButtonPress(){
     const {email, pass} = this.state
     const { tryLogin } = this.props
+
+    this.setState({
+      statusMessage: null, 
+      loading: true
+    })
+
     tryLogin(email, pass)
+      .then(() => {
+        this.setState({ statusMessage: {
+          type: 'success',
+          message: 'logado com sucesso!'
+        }})
+      })
+      .catch(error => this.setState({ statusMessage: {
+        type: 'error',
+        message: getMessageByErrorCode(error.code)
+      }}))
+      .then(() => {
+        this.setState({
+          loading: false
+        })
+      })
   }
 
   handleViewPassIconClick = () => {
@@ -60,7 +81,7 @@ class LoginScreen extends React.Component {
   };
 
   renderLoginButton(){
-    const { loading } = this.props
+    const { loading } = this.state
     return (
       loading
       ? null
@@ -105,9 +126,9 @@ class LoginScreen extends React.Component {
             </Layout>
           </FormSection>
           <FormSection flex={3}>
-            <LoadingIndicator isLoading={this.props.loading} caption="Aguarde ..." />
+            <LoadingIndicator isLoading={this.state.loading} caption="Aguarde ..." />
             { this.renderLoginButton() }
-            <StatusMessageDisplay statusMessage={this.props.statusMessage} />
+            <StatusMessageDisplay statusMessage={this.state.statusMessage} />
             <Button style={styles.button} size='giant' appearance='ghost'>Ainda não tem conta?</Button>
           </FormSection>
       </Layout>
@@ -127,9 +148,4 @@ const styles = StyleSheet.create({
   },
 });
 
-const mapStateToProps = (state) => ({
-  statusMessage: state.statusMessage,
-  loading: state.loading
-})
-
-export default connect(mapStateToProps, { tryLogin })(LoginScreen)
+export default connect(null, { tryLogin })(LoginScreen)

@@ -1,4 +1,5 @@
 const getMessageByErrorCode = (errorCode) => { 
+    console.log(errorCode)
     switch (errorCode) { 
         case 'auth/invalid-email': 
             return 'email inválido!' 
