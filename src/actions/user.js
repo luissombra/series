@@ -43,7 +43,7 @@ const tryLogin = (email, pass) => (dispatch) => {
         .catch(error => {
             dispatch(
                 setErrorStatusMessage(
-                    getMessageByErrorCode(error.errorCode)
+                    getMessageByErrorCode(error.code)
                 )
             )
             dispatch(userLoginFail(error))
